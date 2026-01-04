@@ -8,12 +8,13 @@ from typing import Any, ClassVar
 
 from guessit import guessit  # type: ignore
 
+from mnamer import tty
 from mnamer.exceptions import MnamerException
 from mnamer.language import Language
 from mnamer.metadata import Metadata, MetadataEpisode, MetadataMovie
 from mnamer.providers import Provider
 from mnamer.setting_store import SettingStore
-from mnamer.types import MediaType, ProviderType
+from mnamer.types import MediaType, ProviderType, MessageType
 from mnamer.utils import (
     crawl_in,
     filename_replace,
@@ -122,7 +123,7 @@ class Target:
                 file_path = Path(self.source.parent, self.source.stem[:-2])
             except MnamerException:
                 pass
-        options = {"type": self._settings.media, "language": path_data["language"]}
+        options = {"type": self._settings.media, "language": path_data["language"], "episode_prefer_number": True}
         raw_data = dict(guessit(str(file_path), options))
         if isinstance(raw_data.get("season"), list):
             raw_data = dict(guessit(str(file_path.parts[-1]), options))
@@ -181,8 +182,21 @@ class Target:
             self.metadata.year = path_data.get("year")
         elif isinstance(self.metadata, MetadataEpisode):
             self.metadata.date = path_data.get("date")
-            self.metadata.episode = path_data.get("episode")
-            self.metadata.season = self._settings.season if self._settings.season is not None else path_data.get("season")
+            episode = path_data.get("episode")
+            episode_title = path_data.get("episode_title")
+
+            if not episode and episode_title and episode_title.isdigit():
+                self.metadata.episode = episode_title
+            else:
+                self.metadata.episode = episode
+
+            if self._settings.season is not None:
+                self.metadata.season = self._settings.season
+            elif path_data.get("season") == 0:
+                self.metadata.season = None
+            else:
+                self.metadata.season = path_data.get("season")
+
             self.metadata.series = path_data.get("title")
             alternative_title = path_data.get("alternative_title")
             if alternative_title:

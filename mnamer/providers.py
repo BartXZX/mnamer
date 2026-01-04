@@ -265,6 +265,7 @@ class Tvdb(Provider):
                 language=language,
                 page=page,
                 cache=self.cache,
+                absolute_episode=(season is None)
             )
             for entry in episode_data["data"]:
                 try:
@@ -301,6 +302,20 @@ class Tvdb(Provider):
         series_data = tvdb_search_series(
             self.token, series, language=language, cache=self.cache
         )
+
+        def sort_results(item):
+            name = item.get("seriesName", "")
+            aliases = item.get("aliases", [])
+
+            # Priority 1: Exact match (0 if match, 1 if not)
+            exact_match = 0 if name.lower() == series.lower() else 1
+
+            # Priority 2: Contained in aliases (0 if in aliases, 1 if not)
+            alias_match = 0 if any(series.lower() == a.lower() for a in aliases) else 1
+
+            return (exact_match, alias_match)
+
+        series_data['data'].sort(key=sort_results)
 
         for series_id in [entry["id"] for entry in series_data["data"][:5]]:
             try:

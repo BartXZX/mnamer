@@ -330,6 +330,7 @@ def tvdb_series_id_episodes_query(
     page: int = 1,
     language: Language | None = None,
     cache: bool = True,
+    absolute_episode: bool = False,
 ) -> dict:
     """
     Allows the user to query against episodes for the given series.
@@ -343,7 +344,12 @@ def tvdb_series_id_episodes_query(
     headers = {"Authorization": f"Bearer {token}"}
     if language:
         headers["Accept-Language"] = language.a2
-    parameters = {"airedSeason": season, "airedEpisode": episode, "page": page}
+
+    if absolute_episode:
+        parameters = {"absoluteNumber": episode, "page": page}
+    else:
+        parameters = {"airedSeason": season, "airedEpisode": episode, "page": page}
+
     status, content = request_json(
         url,
         parameters,
