@@ -9,6 +9,7 @@ from mnamer.exceptions import (
     MnamerNotFoundException,
     MnamerSkipException,
 )
+from mnamer.metadata import MetadataEpisode
 from mnamer.setting_store import SettingStore
 from mnamer.target import Target
 from mnamer.types import MessageType
