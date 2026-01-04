@@ -109,7 +109,13 @@ class Cli(Frontend):
                 continue
             try:
                 if self.settings.batch:
-                    match = matches[0] if matches else target.metadata
+                    if matches:
+                        match = matches[0]
+                    else:
+                        match = target.metadata
+                        if isinstance(match, MetadataEpisode) and not match.id_tvdb:
+                            tty.msg("skipping, since guessing in batch mode is only allowed with show ID override", MessageType.ALERT)
+                            continue
                 elif not matches:
                     match = tty.metadata_guess(target.metadata)
                 else:
