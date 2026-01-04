@@ -256,6 +256,7 @@ class Tvdb(Provider):
             self.token, id_tvdb, language=language, cache=self.cache
         )
         page = 1
+        absolute_episode = (season is None)
         while True:
             episode_data = tvdb_series_id_episodes_query(
                 self.token,
@@ -265,15 +266,15 @@ class Tvdb(Provider):
                 language=language,
                 page=page,
                 cache=self.cache,
-                absolute_episode=(season is None)
+                absolute_episode=absolute_episode
             )
             for entry in episode_data["data"]:
                 try:
                     yield MetadataEpisode(
                         date=entry["firstAired"],
-                        episode=entry["airedEpisodeNumber"],
+                        episode=entry["dvdEpisodeNumber"] if absolute_episode and entry["dvdEpisodeNumber"] else entry["airedEpisodeNumber"],
                         id_tvdb=id_tvdb,
-                        season=entry["airedSeason"],
+                        season=entry["dvdSeason"] if absolute_episode and entry["dvdSeason"] else entry["airedSeason"],
                         series=series_data["data"]["seriesName"],
                         language=language,
                         synopsis=(entry["overview"] or "")
