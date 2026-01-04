@@ -149,20 +149,20 @@ class Target:
         }[media_type]
         self.metadata = meta_cls()
         self.metadata.quality = (
-            " ".join(
-                path_data[key]
-                for key in path_data
-                if key
-                in (
-                    "audio_codec",
-                    "audio_profile",
-                    "screen_size",
-                    "source",
-                    "video_codec",
-                    "video_profile",
+                " ".join(
+                    path_data[key]
+                    for key in path_data
+                    if key
+                    in (
+                        "audio_codec",
+                        "audio_profile",
+                        "screen_size",
+                        "source",
+                        "video_codec",
+                        "video_profile",
+                    )
                 )
-            )
-            or None
+                or None
         )
         self.metadata.language = path_data.get("language")
         self.metadata.group = path_data.get("release_group")
