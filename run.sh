@@ -1,10 +1,17 @@
 #!/bin/sh
 
-while true; do
-    mnamer $MNAMER_SOURCE_DIR --config-path=$MNAMER_CONFIG_PATH
+echo "Executing mnamer"
+mnamer $MNAMER_SOURCE_DIR --config-path=$MNAMER_CONFIG_PATH
 
-    echo "Waiting 55s for changes..."
-    inotifywait -r -t 55 -e modify,create,move "$MNAMER_SOURCE_DIR"
-    echo "Waiting an additional 5s to give additional file moves a chance to finish"
-    sleep 5
+inotifywait -mre create,modify,move $MNAMER_SOURCE_DIR | while read -r dirname events basename;
+do
+  echo "New events received, collecting more for 5s"
+  echo "$dirname $events $basename"
+
+  # Consume all events that happen within the next seconds
+  while read -t 5 -r next_event; do
+    echo $next_event
+  done
+
+  mnamer $MNAMER_SOURCE_DIR --config-path=$MNAMER_CONFIG_PATH
 done
