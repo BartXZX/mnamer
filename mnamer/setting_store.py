@@ -319,6 +319,14 @@ class SettingStore:
             help="--media={movie,episode}: override media detection",
         ).as_dict(),
     )
+    season: int | None = dataclasses.field(
+        default=None,
+        metadata=SettingSpec(
+            flags=["--season"],
+            group=SettingType.DIRECTIVE,
+            help="--season=<number>: specify a series season override",
+        ).as_dict(),
+    )
     test: bool = dataclasses.field(
         default=False,
         metadata=SettingSpec(

@@ -182,7 +182,7 @@ class Target:
         elif isinstance(self.metadata, MetadataEpisode):
             self.metadata.date = path_data.get("date")
             self.metadata.episode = path_data.get("episode")
-            self.metadata.season = path_data.get("season")
+            self.metadata.season = self._settings.season if self._settings.season is not None else path_data.get("season")
             self.metadata.series = path_data.get("title")
             alternative_title = path_data.get("alternative_title")
             if alternative_title:
