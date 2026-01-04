@@ -92,6 +92,10 @@ class Cli(Frontend):
             self._announce_file(target)
             self._list_details(target)
 
+            if target.source.stat().st_nlink > 1:
+                tty.msg("more than 1 hard link found, assuming file already handled", MessageType.ALERT)
+                continue
+
             # find match for target
             matches = []
             try:

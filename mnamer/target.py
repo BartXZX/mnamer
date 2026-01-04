@@ -243,6 +243,7 @@ class Target:
         destination_path = Path(self.destination).resolve()
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            move(str(self.source), destination_path)
+            if not destination_path.exists(follow_symlinks=True):
+                destination_path.hardlink_to(self.source.resolve())
         except OSError as e:  # pragma: no cover
             raise MnamerException from e
